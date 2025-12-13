@@ -3,49 +3,52 @@ import {
   NotFoundException,
   ForbiddenException,
 } from '@nestjs/common';
-import { randomUUID } from 'node:crypto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
-import { DatabaseService } from '../database/database.service';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly db: DatabaseService) {}
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+  ) {}
 
-  findAll(): Omit<User, 'password'>[] {
-    return this.db.users.map(({ password, ...user }) => user);
+  async findAll(): Promise<Omit<User, 'password'>[]> {
+    const users = await this.userRepository.find();
+    return users.map(({ password: _password, ...user }) => user);
   }
 
-  findOne(id: string): Omit<User, 'password'> {
-    const user = this.db.users.find((u) => u.id === id);
+  async findOne(id: string): Promise<Omit<User, 'password'>> {
+    const user = await this.userRepository.findOne({ where: { id } });
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    const { password, ...userWithoutPassword } = user;
+    const { password: _password, ...userWithoutPassword } = user;
     return userWithoutPassword;
   }
 
-  create(createUserDto: CreateUserDto): Omit<User, 'password'> {
+  async create(createUserDto: CreateUserDto): Promise<Omit<User, 'password'>> {
     const now = Date.now();
-    const user: User = {
-      id: randomUUID(),
+    const user = this.userRepository.create({
       login: createUserDto.login,
       password: createUserDto.password,
       version: 1,
       createdAt: now,
       updatedAt: now,
-    };
-    this.db.users.push(user);
-    const { password, ...userWithoutPassword } = user;
+    });
+    const savedUser = await this.userRepository.save(user);
+    const { password: _password, ...userWithoutPassword } = savedUser;
     return userWithoutPassword;
   }
 
-  update(
+  async update(
     id: string,
     updatePasswordDto: UpdatePasswordDto,
-  ): Omit<User, 'password'> {
-    const user = this.db.users.find((u) => u.id === id);
+  ): Promise<Omit<User, 'password'>> {
+    const user = await this.userRepository.findOne({ where: { id } });
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -55,15 +58,16 @@ export class UserService {
     user.password = updatePasswordDto.newPassword;
     user.version += 1;
     user.updatedAt = Date.now();
-    const { password, ...userWithoutPassword } = user;
+    const updatedUser = await this.userRepository.save(user);
+    const { password: _password, ...userWithoutPassword } = updatedUser;
     return userWithoutPassword;
   }
 
-  remove(id: string): void {
-    const index = this.db.users.findIndex((u) => u.id === id);
-    if (index === -1) {
+  async remove(id: string): Promise<void> {
+    const user = await this.userRepository.findOne({ where: { id } });
+    if (!user) {
       throw new NotFoundException('User not found');
     }
-    this.db.users.splice(index, 1);
+    await this.userRepository.remove(user);
   }
 }

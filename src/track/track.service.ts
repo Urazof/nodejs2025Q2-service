@@ -1,40 +1,41 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { randomUUID } from 'node:crypto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { Track } from './entities/track.entity';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
-import { DatabaseService } from '../database/database.service';
 
 @Injectable()
 export class TrackService {
-  constructor(private readonly db: DatabaseService) {}
+  constructor(
+    @InjectRepository(Track)
+    private readonly trackRepository: Repository<Track>,
+  ) {}
 
-  findAll(): Track[] {
-    return this.db.tracks;
+  async findAll(): Promise<Track[]> {
+    return await this.trackRepository.find();
   }
 
-  findOne(id: string): Track {
-    const track = this.db.tracks.find((t) => t.id === id);
+  async findOne(id: string): Promise<Track> {
+    const track = await this.trackRepository.findOne({ where: { id } });
     if (!track) {
       throw new NotFoundException('Track not found');
     }
     return track;
   }
 
-  create(createTrackDto: CreateTrackDto): Track {
-    const track: Track = {
-      id: randomUUID(),
+  async create(createTrackDto: CreateTrackDto): Promise<Track> {
+    const track = this.trackRepository.create({
       name: createTrackDto.name,
       artistId: createTrackDto.artistId ?? null,
       albumId: createTrackDto.albumId ?? null,
       duration: createTrackDto.duration,
-    };
-    this.db.tracks.push(track);
-    return track;
+    });
+    return await this.trackRepository.save(track);
   }
 
-  update(id: string, updateTrackDto: UpdateTrackDto): Track {
-    const track = this.db.tracks.find((t) => t.id === id);
+  async update(id: string, updateTrackDto: UpdateTrackDto): Promise<Track> {
+    const track = await this.trackRepository.findOne({ where: { id } });
     if (!track) {
       throw new NotFoundException('Track not found');
     }
@@ -42,20 +43,15 @@ export class TrackService {
     track.artistId = updateTrackDto.artistId ?? null;
     track.albumId = updateTrackDto.albumId ?? null;
     track.duration = updateTrackDto.duration;
-    return track;
+    return await this.trackRepository.save(track);
   }
 
-  remove(id: string): void {
-    const index = this.db.tracks.findIndex((t) => t.id === id);
-    if (index === -1) {
+  async remove(id: string): Promise<void> {
+    const track = await this.trackRepository.findOne({ where: { id } });
+    if (!track) {
       throw new NotFoundException('Track not found');
     }
-    this.db.tracks.splice(index, 1);
-
-    // Remove from favorites
-    const favIndex = this.db.favorites.tracks.indexOf(id);
-    if (favIndex !== -1) {
-      this.db.favorites.tracks.splice(favIndex, 1);
-    }
+    // onDelete: 'CASCADE' в FavoriteTrack автоматически удалит из избранного
+    await this.trackRepository.remove(track);
   }
 }
