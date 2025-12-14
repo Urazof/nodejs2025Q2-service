@@ -24,20 +24,31 @@ WORKDIR /app
 
 # Копируем package.json для production зависимостей
 COPY package*.json ./
+COPY tsconfig.json ./
 
-# Устанавливаем только production зависимости
-RUN npm install --only=production && npm cache clean --force
+# Устанавливаем production зависимости + dev зависимости для миграций
+RUN npm ci && npm cache clean --force
 
 # Копируем собранное приложение из builder
 COPY --from=builder /app/dist ./dist
 
+# Копируем все исходники для миграций (они нужны для ts-node)
+COPY --from=builder /app/src ./src
+
+# Копируем скрипт запуска
+COPY start.sh ./
+
 # Создаём non-root пользователя для безопасности
 RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001
+
+# Даём права на файлы приложения и делаем скрипт исполняемым
+RUN chown -R nodejs:nodejs /app && chmod +x /app/start.sh
+
 USER nodejs
 
 # Открываем порт приложения
 EXPOSE 4000
 
-# Запускаем приложение
-CMD ["node", "dist/main.js"]
+# Запускаем скрипт через sh
+CMD ["sh", "/app/start.sh"]
 

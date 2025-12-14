@@ -31,8 +31,16 @@ import { FavoriteTrack } from './favorites/entities/favorite-track.entity';
       username: process.env.POSTGRES_USER || 'postgres',
       password: process.env.POSTGRES_PASSWORD || 'postgres',
       database: process.env.POSTGRES_DB || 'home_library',
-      entities: [User, Artist, Album, Track, FavoriteArtist, FavoriteAlbum, FavoriteTrack],
-      synchronize: true, // ВАЖНО: только для разработки! автоматически создаёт таблицы
+      entities: [
+        User,
+        Artist,
+        Album,
+        Track,
+        FavoriteArtist,
+        FavoriteAlbum,
+        FavoriteTrack,
+      ],
+      synchronize: true, // Временно включено для тестирования
       logging: false,
     }),
     UserModule,

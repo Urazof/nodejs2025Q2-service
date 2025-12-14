@@ -19,4 +19,3 @@ export class FavoriteAlbum {
   @CreateDateColumn()
   createdAt: Date;
 }
-

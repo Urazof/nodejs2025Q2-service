@@ -18,7 +18,8 @@ export class UserService {
 
   async findAll(): Promise<Omit<User, 'password'>[]> {
     const users = await this.userRepository.find();
-    return users.map(({ password: _password, ...user }) => user);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    return users.map(({ password, ...user }) => user);
   }
 
   async findOne(id: string): Promise<Omit<User, 'password'>> {
@@ -26,7 +27,8 @@ export class UserService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    const { password: _password, ...userWithoutPassword } = user;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...userWithoutPassword } = user;
     return userWithoutPassword;
   }
 
@@ -40,7 +42,8 @@ export class UserService {
       updatedAt: now,
     });
     const savedUser = await this.userRepository.save(user);
-    const { password: _password, ...userWithoutPassword } = savedUser;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...userWithoutPassword } = savedUser;
     return userWithoutPassword;
   }
 
@@ -59,7 +62,8 @@ export class UserService {
     user.version += 1;
     user.updatedAt = Date.now();
     const updatedUser = await this.userRepository.save(user);
-    const { password: _password, ...userWithoutPassword } = updatedUser;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...userWithoutPassword } = updatedUser;
     return userWithoutPassword;
   }
 

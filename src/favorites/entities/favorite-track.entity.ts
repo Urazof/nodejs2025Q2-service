@@ -19,4 +19,3 @@ export class FavoriteTrack {
   @CreateDateColumn()
   createdAt: Date;
 }
-
