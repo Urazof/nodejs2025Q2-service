@@ -265,6 +265,32 @@ docker push sergurr/home-library-app:latest
 docker push sergurr/home-library-app:1.1.0
 ```
 
+### Switching to Docker Hub Image
+
+If you want to use a pre-built application image from Docker Hub instead of building locally (e.g., for testing or review):
+
+1. Open the `docker-compose.yml` file
+2. In the `app` section, uncomment the line:
+   ```
+   image: sergurr/home-library-app:latest
+   ```
+3. Comment out the `build` section:
+   ```
+   # build:
+   #   context: .
+   #   dockerfile: Dockerfile
+   ```
+4. Pull the image:
+   ```
+   docker-compose pull app
+   ```
+5. Start the containers:
+   ```
+   docker-compose up -d
+   ```
+
+**Note:** Ensure the `sergurr/home-library-app:latest` image is available on Docker Hub. To revert to local builds, undo the changes in `docker-compose.yml`.
+
 ## API Documentation
 
 API documentation is available in `doc/api.yaml` (OpenAPI 3.0 format).
@@ -394,4 +420,3 @@ npm test
 ## License
 
 This project is licensed under the UNLICENSED license.
-
