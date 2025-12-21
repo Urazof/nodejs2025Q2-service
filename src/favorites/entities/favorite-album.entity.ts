@@ -16,6 +16,6 @@ export class FavoriteAlbum {
   @JoinColumn({ name: 'albumId' })
   album: Album;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ select: false })
   createdAt: Date;
 }

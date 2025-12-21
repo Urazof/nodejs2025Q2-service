@@ -10,6 +10,89 @@ Users can create, read, update, delete data about Artists, Tracks and Albums, ad
 - **TypeORM** - ORM for TypeScript and JavaScript with migrations support
 - **PostgreSQL** - Powerful, open source object-relational database
 - **Docker** - Containerization platform
+- **JWT** - JSON Web Tokens for authentication
+- **Bcrypt** - Password hashing library
+- **Passport** - Authentication middleware for Node.js
+
+## Authentication & Authorization
+
+The application implements a complete JWT-based authentication system:
+
+### Features
+- ✅ **User Registration** (`POST /auth/signup`) - Create new users with hashed passwords
+- ✅ **Login** (`POST /auth/login`) - Authenticate and receive Access & Refresh tokens
+- ✅ **Token Refresh** (`POST /auth/refresh`) - Get new token pair using refresh token
+- ✅ **Global JWT Guard** - All endpoints protected by default
+- ✅ **Bcrypt Password Hashing** - Passwords never stored in plain text
+- ✅ **Bearer Authentication** - Standard `Authorization: Bearer <token>` header
+
+### Public Endpoints (No Authentication Required)
+- `POST /auth/signup` - User registration
+- `POST /auth/login` - User login
+- `POST /auth/refresh` - Refresh tokens
+- `GET /` - Root endpoint
+- `GET /doc` - API documentation
+
+### Protected Endpoints (Authentication Required)
+All other endpoints require a valid JWT token:
+- `/users/*` - User management
+- `/artists/*` - Artist management
+- `/albums/*` - Album management
+- `/tracks/*` - Track management
+- `/favs/*` - Favorites management
+
+### Environment Variables
+```env
+# Bcrypt
+CRYPT_SALT=10
+
+# JWT Configuration
+JWT_SECRET_KEY=your_secret_key_here
+JWT_SECRET_REFRESH_KEY=your_refresh_secret_key_here
+TOKEN_EXPIRE_TIME=1h
+TOKEN_REFRESH_EXPIRE_TIME=24h
+```
+
+### Usage Examples
+
+**Register a new user:**
+```bash
+curl -X POST http://localhost:4000/auth/signup \
+  -H "Content-Type: application/json" \
+  -d '{"login": "testuser", "password": "testpass123"}'
+```
+
+**Login:**
+```bash
+curl -X POST http://localhost:4000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"login": "testuser", "password": "testpass123"}'
+```
+
+**Access protected endpoint:**
+```bash
+curl -X GET http://localhost:4000/users \
+  -H "Authorization: Bearer <your_access_token>"
+```
+
+**Refresh tokens:**
+```bash
+curl -X POST http://localhost:4000/auth/refresh \
+  -H "Content-Type: application/json" \
+  -d '{"refreshToken": "<your_refresh_token>"}'
+```
+
+📖 **Detailed documentation:** See [AUTH_IMPLEMENTATION_SUMMARY.md](AUTH_IMPLEMENTATION_SUMMARY.md) for complete implementation details and flow diagrams.
+
+## Logging & Error Handling
+
+The application includes a robust logging system and centralized error handling:
+
+- **Custom Logging Service**: Extends NestJS ConsoleLogger with support for file logging and rotation.
+- **HTTP Logging**: Automatically logs all incoming requests (method, URL, query, body) and responses (status, duration).
+- **Error Handling**: Global exception filter catches all errors. Unexpected errors return a generic 500 response to the client while logging full details internally.
+- **File Rotation**: Log files are automatically rotated when they reach a configured size (default 10MB).
+- **Configuration**: Fully configurable via environment variables (`LOG_LEVEL`, `LOG_TO_FILE`, `LOG_MAX_FILE_SIZE`).
 
 ## Recent Updates (December 2025)
 
@@ -158,15 +241,29 @@ See [MIGRATIONS.md](MIGRATIONS.md) for detailed documentation.
 ## Testing
 
 ```bash
-# Run all tests
+# Run all tests (59 tests)
 npm test
 
-# Run tests with auth
+# Run tests with authentication (86 tests)
 npm run test:auth
 
-# Run refresh token tests
+# Run refresh token tests (4 tests)
 npm run test:refresh
+
+# Run tests with coverage
+npm run test:cov
+
+# Run tests in watch mode
+npm run test:watch
 ```
+
+**Test Results:**
+- ✅ All 59 basic tests passing
+- ✅ All 86 authentication tests passing
+- ✅ All 4 refresh token tests passing
+- ✅ **Total: 90 tests passing**
+
+**Note:** After implementing JWT authentication, all tests now require a valid token. The global `JwtAuthGuard` ensures all endpoints are protected by default.
 
 ## Development Tools
 

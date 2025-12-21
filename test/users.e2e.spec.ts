@@ -1,11 +1,7 @@
 import { validate } from 'uuid';
 import { StatusCodes } from 'http-status-codes';
 import { request } from './lib';
-import {
-  getTokenAndUserId,
-  shouldAuthorizationBeTested,
-  removeTokenUser,
-} from './utils';
+import { getTokenAndUserId, removeTokenUser } from './utils';
 import { usersRoutes } from './endpoints';
 
 const createUserDto = {
@@ -22,11 +18,9 @@ describe('Users (e2e)', () => {
   let mockUserId: string | undefined;
 
   beforeAll(async () => {
-    if (shouldAuthorizationBeTested) {
-      const result = await getTokenAndUserId(unauthorizedRequest);
-      commonHeaders['Authorization'] = result.token;
-      mockUserId = result.mockUserId;
-    }
+    const result = await getTokenAndUserId(unauthorizedRequest);
+    commonHeaders['Authorization'] = result.token;
+    mockUserId = result.mockUserId;
   });
 
   afterAll(async () => {

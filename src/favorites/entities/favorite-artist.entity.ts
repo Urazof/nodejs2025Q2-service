@@ -16,6 +16,6 @@ export class FavoriteArtist {
   @JoinColumn({ name: 'artistId' })
   artist: Artist;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ select: false })
   createdAt: Date;
 }

@@ -1,11 +1,7 @@
 import { request } from './lib';
 import { StatusCodes } from 'http-status-codes';
 import { validate } from 'uuid';
-import {
-  getTokenAndUserId,
-  shouldAuthorizationBeTested,
-  removeTokenUser,
-} from './utils';
+import { getTokenAndUserId, removeTokenUser } from './utils';
 import { albumsRoutes, artistsRoutes, tracksRoutes } from './endpoints';
 
 const createArtistDto = {
@@ -22,11 +18,9 @@ describe('artist (e2e)', () => {
   let mockUserId: string | undefined;
 
   beforeAll(async () => {
-    if (shouldAuthorizationBeTested) {
-      const result = await getTokenAndUserId(unauthorizedRequest);
-      commonHeaders['Authorization'] = result.token;
-      mockUserId = result.mockUserId;
-    }
+    const result = await getTokenAndUserId(unauthorizedRequest);
+    commonHeaders['Authorization'] = result.token;
+    mockUserId = result.mockUserId;
   });
 
   afterAll(async () => {

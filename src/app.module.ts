@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
+import { APP_FILTER, APP_INTERCEPTOR, APP_GUARD } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
@@ -8,6 +9,9 @@ import { ArtistModule } from './artist/artist.module';
 import { AlbumModule } from './album/album.module';
 import { TrackModule } from './track/track.module';
 import { FavoritesModule } from './favorites/favorites.module';
+import { LoggingModule } from './logging/logging.module';
+import { AllExceptionsFilter } from './logging/all-exceptions.filter';
+import { HttpLoggingInterceptor } from './logging/http-logging.interceptor';
 import { User } from './user/entities/user.entity';
 import { Artist } from './artist/entities/artist.entity';
 import { Album } from './album/entities/album.entity';
@@ -15,6 +19,8 @@ import { Track } from './track/entities/track.entity';
 import { FavoriteArtist } from './favorites/entities/favorite-artist.entity';
 import { FavoriteAlbum } from './favorites/entities/favorite-album.entity';
 import { FavoriteTrack } from './favorites/entities/favorite-track.entity';
+import { AuthModule } from './auth/auth.module';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
 
 @Module({
   imports: [
@@ -40,7 +46,7 @@ import { FavoriteTrack } from './favorites/entities/favorite-track.entity';
         FavoriteAlbum,
         FavoriteTrack,
       ],
-      synchronize: true, // Временно включено для тестирования
+      synchronize: process.env.TYPEORM_SYNCHRONIZE === 'true', // Controlled by env var
       logging: false,
     }),
     UserModule,
@@ -48,8 +54,24 @@ import { FavoriteTrack } from './favorites/entities/favorite-track.entity';
     AlbumModule,
     TrackModule,
     FavoritesModule,
+    LoggingModule,
+    AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: HttpLoggingInterceptor,
+    },
+  ],
 })
 export class AppModule {}
