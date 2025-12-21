@@ -40,7 +40,7 @@ import { FavoriteTrack } from './favorites/entities/favorite-track.entity';
         FavoriteAlbum,
         FavoriteTrack,
       ],
-      synchronize: true, // Временно включено для тестирования
+      synchronize: process.env.TYPEORM_SYNCHRONIZE === 'true', // Controlled by env var
       logging: false,
     }),
     UserModule,
