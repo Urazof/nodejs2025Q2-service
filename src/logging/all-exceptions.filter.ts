@@ -59,7 +59,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
     // Формируем ответ
     const errorResponse = {
       statusCode: status,
-      message: status === HttpStatus.INTERNAL_SERVER_ERROR ? 'Internal server error' : message,
+      message:
+        status === HttpStatus.INTERNAL_SERVER_ERROR
+          ? 'Internal server error'
+          : message,
       timestamp: new Date().toISOString(),
       path: request.url,
     };

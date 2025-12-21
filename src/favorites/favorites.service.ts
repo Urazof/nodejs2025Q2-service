@@ -37,9 +37,9 @@ export class FavoritesService {
     const favoriteTracks = await this.favoriteTrackRepository.find();
 
     return {
-      artists: favoriteArtists.map((fa) => fa.artist),
-      albums: favoriteAlbums.map((fa) => fa.album),
-      tracks: favoriteTracks.map((ft) => ft.track),
+      artists: favoriteArtists.map((fa) => fa.artist).filter(Boolean),
+      albums: favoriteAlbums.map((fa) => fa.album).filter(Boolean),
+      tracks: favoriteTracks.map((ft) => ft.track).filter(Boolean),
     };
   }
 

@@ -16,6 +16,6 @@ export class FavoriteTrack {
   @JoinColumn({ name: 'trackId' })
   track: Track;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ select: false })
   createdAt: Date;
 }

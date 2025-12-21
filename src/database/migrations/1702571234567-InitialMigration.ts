@@ -62,6 +62,7 @@ export class InitialMigration1702571234567 implements MigrationInterface {
       CREATE TABLE "favorite_artists" (
         "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
         "artistId" uuid NOT NULL,
+        "createdAt" TIMESTAMP NOT NULL DEFAULT now(),
         CONSTRAINT "PK_favorite_artists" PRIMARY KEY ("id"),
         CONSTRAINT "FK_favorite_artists" FOREIGN KEY ("artistId") REFERENCES "artists"("id") ON DELETE CASCADE
       )
@@ -72,6 +73,7 @@ export class InitialMigration1702571234567 implements MigrationInterface {
       CREATE TABLE "favorite_albums" (
         "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
         "albumId" uuid NOT NULL,
+        "createdAt" TIMESTAMP NOT NULL DEFAULT now(),
         CONSTRAINT "PK_favorite_albums" PRIMARY KEY ("id"),
         CONSTRAINT "FK_favorite_albums" FOREIGN KEY ("albumId") REFERENCES "albums"("id") ON DELETE CASCADE
       )
@@ -82,6 +84,7 @@ export class InitialMigration1702571234567 implements MigrationInterface {
       CREATE TABLE "favorite_tracks" (
         "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
         "trackId" uuid NOT NULL,
+        "createdAt" TIMESTAMP NOT NULL DEFAULT now(),
         CONSTRAINT "PK_favorite_tracks" PRIMARY KEY ("id"),
         CONSTRAINT "FK_favorite_tracks" FOREIGN KEY ("trackId") REFERENCES "tracks"("id") ON DELETE CASCADE
       )

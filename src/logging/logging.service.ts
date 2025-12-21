@@ -19,7 +19,10 @@ export class LoggingService extends ConsoleLogger {
     this.logFilePath = process.env.LOG_FILE_PATH || 'logs/app.log';
 
     // Размер файла в кБ из переменной окружения, по умолчанию 10MB (10240 кБ)
-    const maxFileSizeKb = parseInt(process.env.LOG_MAX_FILE_SIZE || '10240', 10);
+    const maxFileSizeKb = parseInt(
+      process.env.LOG_MAX_FILE_SIZE || '10240',
+      10,
+    );
     this.maxFileSize = maxFileSizeKb * 1024; // Перевод в байты
 
     // Установка уровня логирования из переменной окружения

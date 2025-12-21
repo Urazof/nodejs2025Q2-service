@@ -19,7 +19,9 @@ async function bootstrap() {
   });
 
   process.on('unhandledRejection', (reason, promise) => {
-    loggingService.error(`Unhandled Rejection at: ${promise}, reason: ${reason}`);
+    loggingService.error(
+      `Unhandled Rejection at: ${promise}, reason: ${reason}`,
+    );
   });
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
