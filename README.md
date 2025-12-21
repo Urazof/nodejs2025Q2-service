@@ -11,6 +11,16 @@ Users can create, read, update, delete data about Artists, Tracks and Albums, ad
 - **PostgreSQL** - Powerful, open source object-relational database
 - **Docker** - Containerization platform
 
+## Logging & Error Handling
+
+The application includes a robust logging system and centralized error handling:
+
+- **Custom Logging Service**: Extends NestJS ConsoleLogger with support for file logging and rotation.
+- **HTTP Logging**: Automatically logs all incoming requests (method, URL, query, body) and responses (status, duration).
+- **Error Handling**: Global exception filter catches all errors. Unexpected errors return a generic 500 response to the client while logging full details internally.
+- **File Rotation**: Log files are automatically rotated when they reach a configured size (default 10MB).
+- **Configuration**: Fully configurable via environment variables (`LOG_LEVEL`, `LOG_TO_FILE`, `LOG_MAX_FILE_SIZE`).
+
 ## Recent Updates (December 2025)
 
 - ✅ **Migrations**: TypeORM migrations automatically run on container startup
